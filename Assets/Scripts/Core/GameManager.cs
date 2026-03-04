@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 public class GameManager : MonoBehaviour
 {
     public enum GameState { Playing, GameOver }
@@ -9,13 +10,13 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; } = GameState.Playing;
 
     [Header("References")]
-    [SerializeField] private MonoBehaviour[] disableOnGameOver; // esim PlayerMovement, MopAttack
-    [SerializeField] private MonoBehaviour spawner;            // toteutetaan Day 3
-    [SerializeField] private GameObject gameOverUI;            // UI-paneeli
+    [SerializeField] private MonoBehaviour[] disableOnGameOver; //  PlayerMovement, MopAttack
+    [SerializeField] private Spawner spawner;            // done Day 3
+    [SerializeField] private GameObject gameOverUI;            // UI-panel
 
     private void Awake()
     {
-        // Estää duplikaatit jos scene reloadaa
+        // blocks duplications if scene reload
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -28,22 +29,27 @@ public class GameManager : MonoBehaviour
             gameOverUI.SetActive(false);
     }
 
+    private void Start()
+    {
+        StartRun();   // auto start for development
+    }
+
+    
+
     public void StartRun()
     {
         State = GameState.Playing;
 
         if (spawner != null)
-            spawner.enabled = true;
+            spawner.StartSpawning();
 
         if (gameOverUI != null)
             gameOverUI.SetActive(false);
 
         foreach (var behaviour in disableOnGameOver)
-        {
-            if (behaviour != null)
-                behaviour.enabled = true;
-        }
+         if (behaviour != null) behaviour.enabled = true;
     }
+    
 
     public void GameOver()
     {
@@ -53,16 +59,14 @@ public class GameManager : MonoBehaviour
         State = GameState.GameOver;
 
         if (spawner != null)
-            spawner.enabled = false;
+            spawner.StopSpawning();
 
         if (gameOverUI != null)
             gameOverUI.SetActive(true);
 
         foreach (var behaviour in disableOnGameOver)
-        {
-            if (behaviour != null)
-                behaviour.enabled = false;
-        }
+          if (behaviour != null) behaviour.enabled = false;
+        
     }
 
     public void Restart()
