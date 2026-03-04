@@ -1,19 +1,29 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AttackHitbox : MonoBehaviour
 {
-    private int damage = 1;
+    [Header("Damage")]
+    [SerializeField] private int damage = 1;
 
-    // PlayerAttack calls this when it wants to set the damage
-    public void SetDamage(int dmg) => damage = dmg;
+    [Header("Knockback")]
+    [SerializeField] private float knockbackForce = 8f;
+
+    private void Awake()
+    {
+       
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // does it hit a FallingObject?
-        FallingObject fo = other.GetComponent<FallingObject>();
-        if (fo != null)
-        {
-            fo.TakeDamage(damage);
-        }
+        
+        FallingObject falling = other.GetComponent<FallingObject>();
+        if (falling == null) return;
+
+        falling.TakeDamage(damage);
+
+        Vector2 dir = (other.transform.position - transform.position).normalized;
+        if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
+
+        falling.Knockback(dir * knockbackForce);
     }
 }

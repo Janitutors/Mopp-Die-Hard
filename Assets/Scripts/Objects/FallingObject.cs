@@ -1,19 +1,38 @@
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class FallingObject : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] private int hp = 1;
-    [SerializeField] private int scoreValue = 10;
 
     [Header("Movement")]
-    [SerializeField] private float fallSpeed = 3f;
+    [SerializeField] private float fallSpeed = 3f;   
     [SerializeField] private float despawnY = -10f;
 
-    private void Update()
+    [Header("Ground")]
+    [SerializeField] private string rooftopName = "Rooftop"; 
+
+    private Rigidbody2D rb;
+    private bool isFalling = true;
+
+    private void Awake()
     {
-        // Predictable constant downward movement
-        transform.position += Vector3.down * (fallSpeed * Time.deltaTime);
+        rb = GetComponent<Rigidbody2D>();
+
+        rb.gravityScale = 0f;
+
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        rb.freezeRotation = true;
+    }
+
+    private void FixedUpdate()
+    {
+        if (isFalling)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -fallSpeed);
+        }
 
         if (transform.position.y < despawnY)
         {
@@ -21,16 +40,30 @@ public class FallingObject : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int dmg)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        hp -= dmg;
-        if (hp <= 0)
-            Die();
+        if (collision.gameObject.name == rooftopName)
+        {
+            isFalling = false;
+            rb.linearVelocity = Vector2.zero;
+        }
     }
 
-    protected virtual void Die()
+    public void TakeDamage(int damage)
     {
-        ScoreManager.AddScore(scoreValue);
-        Destroy(gameObject);
+        hp -= damage;
+
+        if (hp <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void Knockback(Vector2 force)
+    {
+        isFalling = false;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(force, ForceMode2D.Impulse);
     }
 }

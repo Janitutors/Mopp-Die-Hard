@@ -17,6 +17,13 @@ public class Spawner : MonoBehaviour
     private Coroutine loop;
     private bool isActive;
 
+    private FallingObject current;
+
+    private void Start()
+    {
+        StartSpawning();
+    }
+
     public void StartSpawning()
     {
         if (fallingPrefab == null)
@@ -46,15 +53,21 @@ public class Spawner : MonoBehaviour
     {
         while (isActive)
         {
-            SpawnOne();
+            if (current == null)
+            {
+                current = SpawnOne();
+            }
+
+            yield return new WaitUntil(() => current == null);
+
             yield return new WaitForSeconds(spawnInterval);
         }
     }
 
-    private void SpawnOne()
+    private FallingObject SpawnOne()
     {
         float x = Random.Range(spawnXMin, spawnXMax);
         Vector3 pos = new Vector3(x, spawnY, 0f);
-        Instantiate(fallingPrefab, pos, Quaternion.identity);
+        return Instantiate(fallingPrefab, pos, Quaternion.identity);
     }
 }
