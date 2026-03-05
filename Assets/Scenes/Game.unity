@@ -185,7 +185,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.5, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -195,7 +195,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 6}
+  m_Size: {x: 1, y: 5}
   m_EdgeRadius: 0
 --- !u!1 &341213624
 GameObject:
@@ -273,7 +273,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 12, y: 1}
+  m_Size: {x: 10, y: 0.5}
   m_EdgeRadius: 0
 --- !u!1 &519420028
 GameObject:
@@ -804,6 +804,8 @@ GameObject:
   - component: {fileID: 923608228}
   - component: {fileID: 923608231}
   - component: {fileID: 923608232}
+  - component: {fileID: 923608233}
+  - component: {fileID: 923608234}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -977,6 +979,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   hitbox: {fileID: 1629102311}
   hitboxActiveTime: 0.1
+--- !u!114 &923608233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923608226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e6a4ed6b42a4b4cb82b75a12e9e447, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeepInBounds2D
+  minX: -5
+  maxX: 5
+  minY: -2.5
+  maxY: 2
+--- !u!114 &923608234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923608226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 503ee052fdc9a0e41b9435d050e96f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHP: 3
+  currentHP: 0
+  invulnSeconds: 0.5
 --- !u!1 &1146082830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,7 +1076,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.5, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1053,7 +1086,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 6}
+  m_Size: {x: 1, y: 5}
   m_EdgeRadius: 0
 --- !u!1 &1359473863
 GameObject:
@@ -1085,10 +1118,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
   fallingPrefab: {fileID: 2527564609394284491, guid: ffd3dd6e398c35741bf970986e87ac71, type: 3}
-  spawnInterval: 1.5
-  spawnXMin: -5
-  spawnXMax: 5
-  spawnY: 6
+  arena: {fileID: 880416429}
+  spawnY: 5
+  spawnPadding: 0.6
+  startInterval: 1.5
+  minInterval: 0.35
+  rampDuration: 90
+  maxExtraPerWave: 2
+  extraGrowth: 1
+  doubleSpawnBaseChance: 0.1
+  doubleSpawnMaxChance: 0.35
+  bigEnemyChance: 0.06
+  bigScaleRange: {x: 1.4, y: 1.9}
+  bigMassMultiplier: 1.6
 --- !u!4 &1359473865
 Transform:
   m_ObjectHideFlags: 0
@@ -1204,8 +1246,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1629102312}
-  - component: {fileID: 1629102314}
   - component: {fileID: 1629102313}
+  - component: {fileID: 1629102314}
   m_Layer: 0
   m_Name: Hitbox
   m_TagString: Untagged
@@ -1222,7 +1264,7 @@ Transform:
   m_GameObject: {fileID: 1629102311}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1242,8 +1284,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackHitbox
   damage: 1
   knockbackForce: 8
---- !u!61 &1629102314
-BoxCollider2D:
+--- !u!58 &1629102314
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1276,18 +1318,8 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.09528464, y: 0.000000029802322}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1.1905693, y: 0.2377224}
-  m_EdgeRadius: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.8
 --- !u!1 &1773519499
 GameObject:
   m_ObjectHideFlags: 0
