@@ -1,41 +1,46 @@
 using UnityEngine;
-using System.Collections;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [Header("Attack Settings")]
-    [SerializeField] private GameObject hitbox;
-    [SerializeField] private float hitboxActiveTime = 0.1f;
+    [Header("Timing")]
+    [SerializeField] private float activeTime = 0.12f;
 
-    private Coroutine attackRoutine;
+    [Header("References")]
+    [SerializeField] private Collider2D hitboxCollider;
 
-    private void Start()
+    private bool isAttacking;
+
+    private void Awake()
     {
-        if (hitbox != null)
-            hitbox.SetActive(false);
+        if (hitboxCollider == null)
+            hitboxCollider = GetComponentInChildren<Collider2D>(true);
+
+        if (hitboxCollider != null)
+            hitboxCollider.enabled = false;
     }
 
-    private void Update()
+    
+    public void OnAttack()
     {
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
-            DoAttack();
+        DoAttack();
     }
 
     public void DoAttack()
     {
-        if (hitbox == null) return;
+        if (isAttacking) return;
+        if (hitboxCollider == null) return;
 
-        if (attackRoutine != null)
-            StopCoroutine(attackRoutine);
+        isAttacking = true;
+        hitboxCollider.enabled = true;
 
-        attackRoutine = StartCoroutine(AttackWindow());
+        Invoke(nameof(DisableHitbox), activeTime);
     }
 
-    private IEnumerator AttackWindow()
+    private void DisableHitbox()
     {
-        hitbox.SetActive(true);
-        yield return new WaitForSeconds(hitboxActiveTime);
-        hitbox.SetActive(false);
-        attackRoutine = null;
+        if (hitboxCollider != null)
+            hitboxCollider.enabled = false;
+
+        isAttacking = false;
     }
 }
