@@ -2,25 +2,45 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [SerializeField] private AttackHitbox hitbox;
+    [Header("Timing")]
+    [SerializeField] private float activeTime = 0.12f;
+
+    [Header("References")]
+    [SerializeField] private Collider2D hitboxCollider;
+
+    private bool isAttacking;
 
     private void Awake()
     {
-        if (hitbox == null)
-            hitbox = GetComponentInChildren<AttackHitbox>(true);
+        if (hitboxCollider == null)
+            hitboxCollider = GetComponentInChildren<Collider2D>(true);
+
+        if (hitboxCollider != null)
+            hitboxCollider.enabled = false;
+    }
+
+    
+    public void OnAttack()
+    {
+        DoAttack();
     }
 
     public void DoAttack()
     {
-        if (hitbox == null) return;
+        if (isAttacking) return;
+        if (hitboxCollider == null) return;
 
-        hitbox.gameObject.SetActive(true);
-        Invoke(nameof(DisableHitbox), 0.1f);
+        isAttacking = true;
+        hitboxCollider.enabled = true;
+
+        Invoke(nameof(DisableHitbox), activeTime);
     }
 
     private void DisableHitbox()
     {
-        if (hitbox != null)
-            hitbox.gameObject.SetActive(false);
+        if (hitboxCollider != null)
+            hitboxCollider.enabled = false;
+
+        isAttacking = false;
     }
 }

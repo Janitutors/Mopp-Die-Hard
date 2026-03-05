@@ -181,9 +181,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallingObject
   hp: 1
-  scoreValue: 10
   fallSpeed: 3
   despawnY: -10
+  rooftopName: Rooftop
 --- !u!114 &-174068963128229778
 MonoBehaviour:
   m_ObjectHideFlags: 0

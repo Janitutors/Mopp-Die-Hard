@@ -19,10 +19,7 @@ public class Spawner : MonoBehaviour
 
     private FallingObject current;
 
-    private void Start()
-    {
-        StartSpawning();
-    }
+    
 
     public void StartSpawning()
     {
@@ -32,7 +29,7 @@ public class Spawner : MonoBehaviour
             return;
         }
 
-        if (isActive) return;
+        StopSpawning();   // ensure no duplicates
 
         isActive = true;
         loop = StartCoroutine(SpawnLoop());
@@ -58,7 +55,7 @@ public class Spawner : MonoBehaviour
                 current = SpawnOne();
             }
 
-            yield return new WaitUntil(() => current == null);
+            yield return new WaitUntil(() => current == null || !isActive);
 
             yield return new WaitForSeconds(spawnInterval);
         }
