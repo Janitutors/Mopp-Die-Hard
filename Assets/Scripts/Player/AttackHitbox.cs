@@ -8,14 +8,8 @@ public class AttackHitbox : MonoBehaviour
     [Header("Knockback")]
     [SerializeField] private float knockbackForce = 8f;
 
-    private void Awake()
-    {
-       
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        
         FallingObject falling = other.GetComponent<FallingObject>();
         if (falling == null) return;
 

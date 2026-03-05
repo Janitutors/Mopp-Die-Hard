@@ -1,26 +1,41 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [SerializeField] private AttackHitbox hitbox;
+    [Header("Attack Settings")]
+    [SerializeField] private GameObject hitbox;
+    [SerializeField] private float hitboxActiveTime = 0.1f;
 
-    private void Awake()
+    private Coroutine attackRoutine;
+
+    private void Start()
     {
-        if (hitbox == null)
-            hitbox = GetComponentInChildren<AttackHitbox>(true);
+        if (hitbox != null)
+            hitbox.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+            DoAttack();
     }
 
     public void DoAttack()
     {
         if (hitbox == null) return;
 
-        hitbox.gameObject.SetActive(true);
-        Invoke(nameof(DisableHitbox), 0.1f);
+        if (attackRoutine != null)
+            StopCoroutine(attackRoutine);
+
+        attackRoutine = StartCoroutine(AttackWindow());
     }
 
-    private void DisableHitbox()
+    private IEnumerator AttackWindow()
     {
-        if (hitbox != null)
-            hitbox.gameObject.SetActive(false);
+        hitbox.SetActive(true);
+        yield return new WaitForSeconds(hitboxActiveTime);
+        hitbox.SetActive(false);
+        attackRoutine = null;
     }
 }
