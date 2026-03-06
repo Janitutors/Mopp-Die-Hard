@@ -5,6 +5,7 @@ public class FallingObject : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] private int hp = 1;
+    [SerializeField] private int scoreValue = 10;
 
     [Header("Movement")]
     [SerializeField] private float fallSpeed = 3f;   
@@ -15,6 +16,7 @@ public class FallingObject : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool isFalling = true;
+    private bool isDead = false;
 
     private void Awake()
     {
@@ -51,12 +53,21 @@ public class FallingObject : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
         hp -= damage;
 
         if (hp <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
+    }
+    private void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+        
+        ScoreManager.AddScore(scoreValue);
+        Destroy(gameObject);
     }
 
     public void Knockback(Vector2 force)
