@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 7816747734827751462}
   - component: {fileID: 264266176783483378}
   - component: {fileID: 2527564609394284491}
-  - component: {fileID: -174068963128229778}
+  - component: {fileID: 435799613250878785}
+  - component: {fileID: -6731448542909127031}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -184,7 +185,7 @@ MonoBehaviour:
   fallSpeed: 3
   despawnY: -10
   rooftopName: Rooftop
---- !u!114 &-174068963128229778
+--- !u!114 &435799613250878785
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,7 +194,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 7644049202006849531}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 391dd92dae87c9442802613dc88d815e, type: 3}
+  m_Script: {fileID: 11500000, guid: fe5ed1dcc105fed448b65fa15beb8982, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ContactDamage
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyTouchDamage
   damage: 1
+--- !u!58 &-6731448542909127031
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7644049202006849531}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
