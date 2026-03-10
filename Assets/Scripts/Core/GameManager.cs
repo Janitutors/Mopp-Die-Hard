@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; } = GameState.Playing;
 
     [Header("References")]
-    [SerializeField] private MonoBehaviour[] disableOnGameOver; //  PlayerMovement, MopAttack
+    [SerializeField] private MonoBehaviour[] disableOnGameOver; // e.g. PlayerController, PlayerAttack, PlayerInput
     [SerializeField] private Spawner spawner;            // done Day 3
     [SerializeField] private GameObject gameOverUI;            // UI-panel
 
@@ -34,11 +34,22 @@ public class GameManager : MonoBehaviour
         StartRun();   // auto start for development
     }
 
+    private void Update()
+    {
+        if (State == GameState.GameOver && Input.GetKeyDown(KeyCode.R))
+        {
+            Restart();
+        }
+    }
+
+
     
 
     public void StartRun()
     {
         State = GameState.Playing;
+        
+        ScoreManager.ResetScore();
 
         if (spawner != null)
             spawner.StartSpawning();

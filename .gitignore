@@ -100,3 +100,5 @@ InitTestScene*.unity*
 
 # VS Code
 .vscode/
+Assets/TextMeshPro/
+Assets/TextMeshPro/Examples & Extras/

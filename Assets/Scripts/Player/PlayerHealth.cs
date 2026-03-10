@@ -48,5 +48,9 @@ public class PlayerHealth : MonoBehaviour
     {
         // TODO: death animation, sound effect, particles, etc
         Debug.Log("Player died");
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.GameOver();
+        
     }
 }

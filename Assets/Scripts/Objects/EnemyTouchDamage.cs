@@ -4,24 +4,23 @@ public class EnemyTouchDamage : MonoBehaviour
 {
     public int damage = 1;
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        var hp = other.GetComponent<PlayerHealth>();
+        var hp = collision.gameObject.GetComponent<PlayerHealth>();
+        if (hp == null)
+            hp = collision.gameObject.GetComponentInParent<PlayerHealth>();
+
         if (hp != null)
-        {
             hp.TakeDamage(damage);
-        }
     }
 
-    // if the player stays in the trigger, they should take damage repeatedly,
-    // but only once per invulnerability period (i-frames)
-    void OnTriggerStay2D(Collider2D other)
+    void OnCollisionStay2D(Collision2D collision)
     {
-        var hp = other.GetComponent<PlayerHealth>();
+        var hp = collision.gameObject.GetComponent<PlayerHealth>();
+        if (hp == null)
+            hp = collision.gameObject.GetComponentInParent<PlayerHealth>();
+
         if (hp != null)
-        {
-            hp.TakeDamage(damage); // will only actually do damage if player isn't currently invulnerable,
-                                   // so it's safe to call every frame
-        }
+            hp.TakeDamage(damage);
     }
 }

@@ -226,7 +226,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed44ba7647dbde843ac166851522c87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  disableOnGameOver: []
+  disableOnGameOver:
+  - {fileID: 311358793}
+  - {fileID: 311358799}
+  - {fileID: 311358792}
   spawner: {fileID: 726261115}
   gameOverUI: {fileID: 0}
 --- !u!4 &267610558
@@ -370,18 +373,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 5
---- !u!114 &311358794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 311358787}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65fc6aab8dc6455498a7ff5289d38863, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDamageReceiver
 --- !u!4 &311358798 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4879385352687768059, guid: 203aa6a528980c94083ad05012b32dc9, type: 3}
@@ -401,6 +392,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   activeTime: 0.12
   hitboxCollider: {fileID: 1330409973}
+--- !u!114 &311358803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311358787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 503ee052fdc9a0e41b9435d050e96f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHP: 3
+  currentHP: 0
+  invulnSeconds: 0.5
 --- !u!1 &478535333
 GameObject:
   m_ObjectHideFlags: 0
@@ -1646,10 +1652,10 @@ PrefabInstance:
       addedObject: {fileID: 311358793}
     - targetCorrespondingSourceObject: {fileID: 7963961076038188958, guid: 203aa6a528980c94083ad05012b32dc9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 311358794}
+      addedObject: {fileID: 311358799}
     - targetCorrespondingSourceObject: {fileID: 7963961076038188958, guid: 203aa6a528980c94083ad05012b32dc9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 311358799}
+      addedObject: {fileID: 311358803}
   m_SourcePrefab: {fileID: 100100000, guid: 203aa6a528980c94083ad05012b32dc9, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
