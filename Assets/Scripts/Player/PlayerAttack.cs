@@ -1,7 +1,10 @@
 using UnityEngine;
+using System; 
 
 public class PlayerAttack : MonoBehaviour
 {
+    public static Action OnPlayerAttack;
+
     [Header("Timing")]
     [SerializeField] private float activeTime = 0.12f;
 
@@ -31,6 +34,7 @@ public class PlayerAttack : MonoBehaviour
         if (hitboxCollider == null) return;
 
         isAttacking = true;
+        OnPlayerAttack?.Invoke();
         hitboxCollider.enabled = true;
 
         Invoke(nameof(DisableHitbox), activeTime);

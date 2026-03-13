@@ -1,22 +1,35 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class GameManager : MonoBehaviour
 {
-    public enum GameState { Playing, GameOver }
+    public enum GameState
+    {
+        StartScreen,
+        Playing,
+        GameOver
+    }
 
     public static GameManager Instance { get; private set; }
-    public GameState State { get; private set; } = GameState.Playing;
+
+    public GameState State { get; private set; } = GameState.StartScreen;
+
+    public bool IsPlaying => State == GameState.Playing;
+    public bool IsGameOver => State == GameState.GameOver;
+    public bool IsOnStartScreen => State == GameState.StartScreen;
+
+    public float SurvivalTime { get; private set; }
 
     [Header("References")]
-    [SerializeField] private MonoBehaviour[] disableOnGameOver; // e.g. PlayerController, PlayerAttack, PlayerInput
-    [SerializeField] private Spawner spawner;            // done Day 3
-    [SerializeField] private GameObject gameOverUI;            // UI-panel
+    [SerializeField] private MonoBehaviour[] disableOnGameOver;
+    [SerializeField] private Spawner spawner;
+    [SerializeField] private GameObject startUI;
+    [SerializeField] private GameObject gameOverUI;
+    [SerializeField] private GameObject playerRoot;
+    [SerializeField] private GameObject scoreUI;
 
     private void Awake()
     {
-        // blocks duplications if scene reload
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -24,43 +37,88 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
-
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
     }
 
     private void Start()
     {
-        StartRun();   // auto start for development
+        ShowStartScreen();
     }
 
     private void Update()
     {
+        if (State == GameState.Playing)
+        {
+            SurvivalTime += Time.deltaTime;
+        }
+
         if (State == GameState.GameOver && Input.GetKeyDown(KeyCode.R))
         {
             Restart();
         }
     }
 
+    private void ShowStartScreen()
+    {
+        State = GameState.StartScreen;
+        SurvivalTime = 0f;
 
-    
+        ScoreManager.ResetScore();
+
+        if (spawner != null)
+            spawner.StopSpawning();
+
+        if (startUI != null)
+            startUI.SetActive(true);
+
+        if (gameOverUI != null)
+            gameOverUI.SetActive(false);
+        
+        if (playerRoot != null)
+            playerRoot.SetActive(false);
+
+        if (scoreUI != null)
+            scoreUI.SetActive(false);
+
+        foreach (var behaviour in disableOnGameOver)
+        {
+            if (behaviour != null)
+                behaviour.enabled = false;
+        }
+    }
+
+    public void PlayGame()
+    {
+        StartRun();
+    }
 
     public void StartRun()
     {
         State = GameState.Playing;
-        
+        SurvivalTime = 0f;
+
         ScoreManager.ResetScore();
 
-        if (spawner != null)
-            spawner.StartSpawning();
+        if (startUI != null)
+            startUI.SetActive(false);
 
         if (gameOverUI != null)
             gameOverUI.SetActive(false);
 
+        if (playerRoot != null)
+            playerRoot.SetActive(true);
+
+        if (scoreUI != null)
+            scoreUI.SetActive(true);
+            
         foreach (var behaviour in disableOnGameOver)
-         if (behaviour != null) behaviour.enabled = true;
+        {
+            if (behaviour != null)
+                behaviour.enabled = true;
+        }
+
+        if (spawner != null)
+            spawner.StartSpawning();
     }
-    
 
     public void GameOver()
     {
@@ -76,8 +134,10 @@ public class GameManager : MonoBehaviour
             gameOverUI.SetActive(true);
 
         foreach (var behaviour in disableOnGameOver)
-          if (behaviour != null) behaviour.enabled = false;
-        
+        {
+            if (behaviour != null)
+                behaviour.enabled = false;
+        }
     }
 
     public void Restart()

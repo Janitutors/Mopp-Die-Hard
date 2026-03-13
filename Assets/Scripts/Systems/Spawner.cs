@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -13,9 +14,13 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float spawnY = 6f;
     [SerializeField] private float spawnPadding = 0.6f;
 
+    [Header("Lane Spawn")]
+    [SerializeField] private int laneCount = 5;
+    [SerializeField] private float laneEdgePadding = 0.4f;
+
     [Header("Difficulty / Pace")]
     [Tooltip("Initial spawn interval between waves")]
-    [SerializeField] private float startInterval = 1.5f;
+    [SerializeField] private float startInterval = 1.8f;
 
     [Tooltip("Minimum interval (game will not get faster than this)")]
     [SerializeField] private float minInterval = 0.35f;
@@ -25,7 +30,7 @@ public class Spawner : MonoBehaviour
 
     [Header("More enemies over time")]
     [Tooltip("Maximum additional enemies per wave (besides the main one)")]
-    [SerializeField] private int maxExtraPerWave = 2; // up to 3 per wave
+    [SerializeField] private int maxExtraPerWave = 2;
 
     [Tooltip("How quickly the chance for extra enemies grows (0..1)")]
     [SerializeField] private float extraGrowth = 1.0f;
@@ -43,21 +48,22 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] private Vector2 bigScaleRange = new Vector2(1.4f, 1.9f);
 
-    [Tooltip("Extra mass multiplier for big enemies (optional)")]
+    [Tooltip("Extra mass multiplier for big enemies")]
     [SerializeField] private float bigMassMultiplier = 1.6f;
+
+    [Header("Enemy Speed Ramp")]
+    [SerializeField] private float maxFallSpeedMultiplier = 1.3f;
+
+    [Header("Wave Timing")]
+    [SerializeField] private Vector2 extraSpawnDelayRange = new Vector2(0.1f, 0.35f);
+
+    [Header("Score Values")]
+    [SerializeField] private int bigEnemyScore = 25;
 
     private Coroutine loop;
     private bool isActive;
-
-    // Keeps track of the current main object
     private FallingObject current;
-
     private float startTime;
-
-    private void Start()
-    {
-        StartSpawning();
-    }
 
     public void StartSpawning()
     {
@@ -70,6 +76,12 @@ public class Spawner : MonoBehaviour
         if (arena == null)
         {
             Debug.LogError("Spawner: arena is not set!");
+            return;
+        }
+
+        if (laneCount < 1)
+        {
+            Debug.LogError("Spawner: laneCount must be at least 1!");
             return;
         }
 
@@ -95,37 +107,31 @@ public class Spawner : MonoBehaviour
     {
         while (isActive)
         {
-            // Spawn only if there is no current main object
             if (current == null)
             {
                 current = SpawnWave();
             }
 
-            // Wait until the main object is destroyed
-            yield return new WaitUntil(() => current == null);
+            yield return new WaitUntil(() => current == null || !isActive);
 
-            // Dynamic spawn interval
+            if (!isActive)
+                yield break;
+
             yield return new WaitForSeconds(GetCurrentInterval());
         }
     }
 
-    /// <summary>
-    /// Spawns a wave: one main enemy + possible additional enemies.
-    /// Returns the main enemy reference.
-    /// </summary>
     private FallingObject SpawnWave()
     {
         float t01 = GetProgress01();
+        var usedLanes = new List<int>();
 
-        // Main enemy
-        FallingObject main = SpawnOne();
+        FallingObject main = SpawnOne(usedLanes);
 
-        // Random double spawn
         float doubleChance = Mathf.Lerp(doubleSpawnBaseChance, doubleSpawnMaxChance, t01);
         if (Random.value < doubleChance)
-            SpawnOne();
+            StartCoroutine(SpawnWithDelay(usedLanes));
 
-        // More enemies over time
         int extraCount = 0;
         float p = Mathf.Clamp01(t01 * extraGrowth);
 
@@ -136,26 +142,75 @@ public class Spawner : MonoBehaviour
         }
 
         for (int i = 0; i < extraCount; i++)
-            SpawnOne();
+        {
+            StartCoroutine(SpawnWithDelay(usedLanes));
+        }
 
         return main;
     }
 
-    private FallingObject SpawnOne()
+    private IEnumerator SpawnWithDelay(List<int> usedLanes)
+    {
+        float delay = Random.Range(extraSpawnDelayRange.x, extraSpawnDelayRange.y);
+        yield return new WaitForSeconds(delay);
+
+        if (!isActive)
+            yield break;
+
+        SpawnOne(usedLanes);
+    }
+
+    private FallingObject SpawnOne(List<int> usedLanes)
     {
         Bounds b = arena.bounds;
 
-        float minX = b.min.x + spawnPadding;
-        float maxX = b.max.x - spawnPadding;
+        float minX = b.min.x + spawnPadding + laneEdgePadding;
+        float maxX = b.max.x - spawnPadding - laneEdgePadding;
 
-        float x = Random.Range(minX, maxX);
-        Vector3 pos = new Vector3(x, spawnY, 0f);
+        float totalWidth = maxX - minX;
+        float laneWidth = totalWidth / laneCount;
+
+        int chosenLane = GetFreeLane(usedLanes);
+        usedLanes.Add(chosenLane);
+
+        float laneCenterX = minX + (laneWidth * chosenLane) + (laneWidth * 0.5f);
+        Vector3 pos = new Vector3(laneCenterX, spawnY, 0f);
 
         FallingObject obj = Instantiate(fallingPrefab, pos, Quaternion.identity);
+
+        float t01 = GetProgress01();
+        obj.MultiplyFallSpeed(Mathf.Lerp(1f, maxFallSpeedMultiplier, t01));
 
         TryMakeBig(obj);
 
         return obj;
+    }
+
+    private int GetFreeLane(List<int> usedLanes)
+    {
+        var candidates = new List<int>();
+
+        for (int i = 0; i < laneCount; i++)
+        {
+            bool blocked = false;
+
+            foreach (int used in usedLanes)
+            {
+                if (Mathf.Abs(i - used) <= 1)
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+
+            if (!blocked)
+                candidates.Add(i);
+        }
+
+        if (candidates.Count == 0)
+            return Random.Range(0, laneCount);
+
+        return candidates[Random.Range(0, candidates.Count)];
     }
 
     private void TryMakeBig(FallingObject obj)
@@ -170,8 +225,11 @@ public class Spawner : MonoBehaviour
         float s = Random.Range(bigScaleRange.x, bigScaleRange.y);
         obj.transform.localScale = obj.transform.localScale * s;
 
-        // Optional: make big enemies feel heavier
-        var rb = obj.GetComponent<Rigidbody2D>();
+        obj.SetHP(2);
+        obj.SetScoreValue(bigEnemyScore);
+        obj.SetBigEnemy(true);
+
+        Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
         if (rb != null)
             rb.mass *= bigMassMultiplier;
     }

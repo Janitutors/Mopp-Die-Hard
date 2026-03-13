@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
+    public static Action OnPlayerDeath;
+
     [Header("HP")]
     public int maxHP = 3;
     public int currentHP;
@@ -24,10 +27,6 @@ public class PlayerHealth : MonoBehaviour
         currentHP -= amount;
         if (currentHP < 0) currentHP = 0;
 
-        // TODO: change player color/alpha or something to show invulnerability,
-        // maybe spawn some particles or something when hit
-        // Debug.Log($"Player HP: {currentHP}");
-
         if (currentHP == 0)
         {
             Die();
@@ -46,11 +45,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        // TODO: death animation, sound effect, particles, etc
         Debug.Log("Player died");
+
+        OnPlayerDeath?.Invoke();   // NEW EVENT
 
         if (GameManager.Instance != null)
             GameManager.Instance.GameOver();
-        
     }
 }

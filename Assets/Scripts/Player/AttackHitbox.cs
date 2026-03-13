@@ -20,4 +20,13 @@ public class AttackHitbox : MonoBehaviour
 
         falling.Knockback(dir * knockbackForce);
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Collider2D col = GetComponent<Collider2D>();
+        if (col == null) return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(col.bounds.center, col.bounds.size);
+    }
 }
