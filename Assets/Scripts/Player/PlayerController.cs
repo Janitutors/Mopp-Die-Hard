@@ -1,32 +1,38 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 6f;
 
     private Rigidbody2D rb;
-    private Vector2 inputVector;
+    private float inputX;
+    private float inputY;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
-    // Send Messages -moodille varma allekirjoitus
-    public void OnMove(InputValue value)
+    private void Update()
     {
-        inputVector = value.Get<Vector2>();
-
-        if (inputVector.sqrMagnitude > 1f)
-            inputVector = inputVector.normalized;
+        inputX = Input.GetAxisRaw("Horizontal");
+        inputY = Input.GetAxisRaw("Vertical");
     }
 
     private void FixedUpdate()
     {
-        rb.linearVelocity = inputVector * moveSpeed;
+        Vector2 move = new Vector2(inputX, inputY).normalized;
+        rb.linearVelocity = move * moveSpeed;
+    }
+
+    public void StopMovement()
+    {
+        rb.linearVelocity = Vector2.zero;
+        enabled = false;
     }
 }

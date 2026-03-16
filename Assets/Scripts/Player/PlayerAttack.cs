@@ -13,16 +13,22 @@ public class PlayerAttack : MonoBehaviour
     private void Awake()
     {
         if (hitboxCollider == null)
-            hitboxCollider = GetComponentInChildren<Collider2D>(true);
+        {
+            AttackHitbox hitbox = GetComponentInChildren<AttackHitbox>(true);
+            if (hitbox != null)
+                hitboxCollider = hitbox.GetComponent<Collider2D>();
+        }
 
         if (hitboxCollider != null)
             hitboxCollider.enabled = false;
     }
 
-    
-    public void OnAttack()
+    private void Update()
     {
-        DoAttack();
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        {
+            DoAttack();
+        }
     }
 
     public void DoAttack()

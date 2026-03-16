@@ -1,52 +1,82 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class PlayerHealth : MonoBehaviour
 {
     [Header("HP")]
-    public int maxHP = 3;
-    public int currentHP;
+    [SerializeField] private int maxHP = 3;
 
-    [Header("I-frames")]
-    public float invulnSeconds = 0.5f;
+    [Header("Invulnerability")]
+    [SerializeField] private float invulnSeconds = 0.8f;
+    [SerializeField] private Color hurtColor = Color.red;
 
-    bool invulnerable;
+    private int currentHP;
+    private bool invulnerable;
+    private bool dead;
 
-    void Awake()
+    private SpriteRenderer sr;
+    private Color originalColor;
+    private PlayerController controller;
+
+    public int CurrentHP => currentHP;
+    public int MaxHP => maxHP;
+    public bool IsDead => dead;
+
+    public static event Action<int, int> OnHealthChanged;
+    public static event Action OnPlayerDied;
+
+    private void Awake()
     {
+        sr = GetComponent<SpriteRenderer>();
+        controller = GetComponent<PlayerController>();
+        originalColor = sr.color;
         currentHP = maxHP;
     }
 
-    public void TakeDamage(int amount)
+    private void Start()
     {
-        if (invulnerable || amount <= 0) return;
+        OnHealthChanged?.Invoke(currentHP, maxHP);
+    }
 
-        currentHP -= amount;
-        if (currentHP < 0) currentHP = 0;
+    public void TakeDamage(int damage)
+    {
+        if (dead) return;
+        if (invulnerable) return;
 
-        // TODO: change player color/alpha or something to show invulnerability,
-        // maybe spawn some particles or something when hit
-        // Debug.Log($"Player HP: {currentHP}");
+        currentHP -= damage;
+        currentHP = Mathf.Max(0, currentHP);
 
-        if (currentHP == 0)
+        OnHealthChanged?.Invoke(currentHP, maxHP);
+
+        if (currentHP <= 0)
         {
             Die();
             return;
         }
 
-        StartCoroutine(Invuln());
+        StartCoroutine(InvulnerabilityRoutine());
     }
 
-    IEnumerator Invuln()
+    private IEnumerator InvulnerabilityRoutine()
     {
         invulnerable = true;
+        sr.color = hurtColor;
+
         yield return new WaitForSeconds(invulnSeconds);
+
+        sr.color = originalColor;
         invulnerable = false;
     }
 
-    void Die()
+    private void Die()
     {
-        // TODO: death animation, sound effect, particles, etc
-        Debug.Log("Player died");
+        dead = true;
+
+        if (controller != null)
+            controller.StopMovement();
+
+        OnPlayerDied?.Invoke();
     }
 }

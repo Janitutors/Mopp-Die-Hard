@@ -5,19 +5,19 @@ public class AttackHitbox : MonoBehaviour
     [Header("Damage")]
     [SerializeField] private int damage = 1;
 
-    [Header("Knockback")]
-    [SerializeField] private float knockbackForce = 8f;
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        FallingObject falling = other.GetComponent<FallingObject>();
-        if (falling == null) return;
+        FallingBarrel barrel = other.GetComponent<FallingBarrel>();
+        if (barrel != null)
+        {
+            barrel.TakeDamage(damage);
+            return;
+        }
 
-        falling.TakeDamage(damage);
-
-        Vector2 dir = (other.transform.position - transform.position).normalized;
-        if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
-
-        falling.Knockback(dir * knockbackForce);
+        AlienHealth alien = other.GetComponent<AlienHealth>();
+        if (alien != null)
+        {
+            alien.TakeDamage(damage);
+        }
     }
 }

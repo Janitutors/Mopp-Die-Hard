@@ -1,76 +1,54 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class GameManager : MonoBehaviour
 {
-    public enum GameState { Playing, GameOver }
+    [Header("UI")]
+    [SerializeField] private GameObject gameOverPanel;
 
-    public static GameManager Instance { get; private set; }
-    public GameState State { get; private set; } = GameState.Playing;
+    private bool gameOver;
 
-    [Header("References")]
-    [SerializeField] private MonoBehaviour[] disableOnGameOver; //  PlayerMovement, MopAttack
-    [SerializeField] private Spawner spawner;            // done Day 3
-    [SerializeField] private GameObject gameOverUI;            // UI-panel
-
-    private void Awake()
+    private void OnEnable()
     {
-        // blocks duplications if scene reload
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        PlayerHealth.OnPlayerDied += ShowGameOver;
+    }
 
-        Instance = this;
-
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
+    private void OnDisable()
+    {
+        PlayerHealth.OnPlayerDied -= ShowGameOver;
     }
 
     private void Start()
     {
-        StartRun();   // auto start for development
+        gameOver = false;
+        Time.timeScale = 1f;
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
     }
 
-    
-
-    public void StartRun()
+    private void Update()
     {
-        State = GameState.Playing;
+        if (!gameOver) return;
 
-        if (spawner != null)
-            spawner.StartSpawning();
-
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
-
-        foreach (var behaviour in disableOnGameOver)
-         if (behaviour != null) behaviour.enabled = true;
-    }
-    
-
-    public void GameOver()
-    {
-        if (State == GameState.GameOver)
-            return;
-
-        State = GameState.GameOver;
-
-        if (spawner != null)
-            spawner.StopSpawning();
-
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
-
-        foreach (var behaviour in disableOnGameOver)
-          if (behaviour != null) behaviour.enabled = false;
-        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RestartLevel();
+        }
     }
 
-    public void Restart()
+    private void ShowGameOver()
     {
+        gameOver = true;
+        Time.timeScale = 0f;
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+    }
+
+    public void RestartLevel()
+    {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
