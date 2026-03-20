@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get; private set; }
 
+    public static System.Action OnGameOver;
+
     public GameState State { get; private set; } = GameState.StartScreen;
 
     public bool IsPlaying => State == GameState.Playing;
@@ -27,6 +29,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject playerRoot;
     [SerializeField] private GameObject scoreUI;
+    [SerializeField] private PlayerController playerController;
 
     private void Awake()
     {
@@ -72,7 +75,7 @@ public class GameManager : MonoBehaviour
 
         if (gameOverUI != null)
             gameOverUI.SetActive(false);
-        
+
         if (playerRoot != null)
             playerRoot.SetActive(false);
 
@@ -109,7 +112,7 @@ public class GameManager : MonoBehaviour
 
         if (scoreUI != null)
             scoreUI.SetActive(true);
-            
+
         foreach (var behaviour in disableOnGameOver)
         {
             if (behaviour != null)
@@ -130,6 +133,12 @@ public class GameManager : MonoBehaviour
         if (spawner != null)
             spawner.StopSpawning();
 
+        if (playerController != null)
+            playerController.StopMovement();
+
+        if (playerRoot != null)
+            playerRoot.SetActive(false);
+
         if (gameOverUI != null)
             gameOverUI.SetActive(true);
 
@@ -138,6 +147,7 @@ public class GameManager : MonoBehaviour
             if (behaviour != null)
                 behaviour.enabled = false;
         }
+        OnGameOver?.Invoke();
     }
 
     public void Restart()

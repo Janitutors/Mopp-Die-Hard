@@ -24,6 +24,8 @@ public class PlayerHealth : MonoBehaviour
     {
         if (invulnerable || amount <= 0) return;
 
+       // Debug.Log($"[PLAYER DAMAGE] took {amount} dmg | HP before: {currentHP} | frame: {Time.frameCount} | time: {Time.time}");
+
         currentHP -= amount;
         if (currentHP < 0) currentHP = 0;
 

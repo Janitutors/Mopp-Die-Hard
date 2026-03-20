@@ -68,7 +68,8 @@ public class FallingObject : MonoBehaviour
     {
         if (isDead) return;
 
-        // NEW
+        //Debug.Log($"[DAMAGE] {name} took {damage} dmg | frame: {Time.frameCount} | time: {Time.time}");//
+
         OnEnemyHit?.Invoke(this);
 
         hp -= damage;

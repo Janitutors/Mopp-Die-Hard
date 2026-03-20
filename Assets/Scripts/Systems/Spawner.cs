@@ -20,31 +20,31 @@ public class Spawner : MonoBehaviour
 
     [Header("Difficulty / Pace")]
     [Tooltip("Initial spawn interval between waves")]
-    [SerializeField] private float startInterval = 1.8f;
+    [SerializeField] private float startInterval = 2.0f;
 
     [Tooltip("Minimum interval (game will not get faster than this)")]
-    [SerializeField] private float minInterval = 0.35f;
+    [SerializeField] private float minInterval = 0.55f;
 
     [Tooltip("Time in seconds to reach approximately the minimum interval")]
-    [SerializeField] private float rampDuration = 90f;
+    [SerializeField] private float rampDuration = 150f;
 
     [Header("More enemies over time")]
     [Tooltip("Maximum additional enemies per wave (besides the main one)")]
-    [SerializeField] private int maxExtraPerWave = 2;
+    [SerializeField] private int maxExtraPerWave = 1;
 
     [Tooltip("How quickly the chance for extra enemies grows (0..1)")]
-    [SerializeField] private float extraGrowth = 1.0f;
+    [SerializeField] private float extraGrowth = 0.75f;
 
     [Header("Double spawn chance")]
     [Range(0f, 1f)]
-    [SerializeField] private float doubleSpawnBaseChance = 0.10f;
+    [SerializeField] private float doubleSpawnBaseChance = 0.08f;
 
     [Range(0f, 1f)]
-    [SerializeField] private float doubleSpawnMaxChance = 0.35f;
+    [SerializeField] private float doubleSpawnMaxChance = 0.22f;
 
     [Header("Rare big enemies")]
     [Range(0f, 1f)]
-    [SerializeField] private float bigEnemyChance = 0.06f;
+    [SerializeField] private float bigEnemyChance = 0.07f;
 
     [SerializeField] private Vector2 bigScaleRange = new Vector2(1.4f, 1.9f);
 
@@ -52,10 +52,10 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float bigMassMultiplier = 1.6f;
 
     [Header("Enemy Speed Ramp")]
-    [SerializeField] private float maxFallSpeedMultiplier = 1.3f;
+    [SerializeField] private float maxFallSpeedMultiplier = 1.2f;
 
     [Header("Wave Timing")]
-    [SerializeField] private Vector2 extraSpawnDelayRange = new Vector2(0.1f, 0.35f);
+    [SerializeField] private Vector2 extraSpawnDelayRange = new Vector2(0.15f, 0.40f);
 
     [Header("Score Values")]
     [SerializeField] private int bigEnemyScore = 25;

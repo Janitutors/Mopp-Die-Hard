@@ -16,9 +16,11 @@ public class PlayerController : MonoBehaviour
         rb.freezeRotation = true;
     }
 
-    // Send Messages -moodille varma allekirjoitus
     public void OnMove(InputValue value)
     {
+        if (GameManager.Instance != null && !GameManager.Instance.IsPlaying)
+            return;
+
         inputVector = value.Get<Vector2>();
 
         if (inputVector.sqrMagnitude > 1f)
@@ -27,6 +29,25 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (GameManager.Instance != null && !GameManager.Instance.IsPlaying)
+        {
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         rb.linearVelocity = inputVector * moveSpeed;
+    }
+
+    public void StopMovement()
+    {
+        inputVector = Vector2.zero;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.simulated = false;
+        }
     }
 }
